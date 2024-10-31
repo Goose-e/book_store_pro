@@ -44,7 +44,7 @@ export default {
       try {
         const response = await axios.post('http://localhost:5000/api/v1/auth/signup', {
           login: this.username,
-          userAge: 15, // Замените на соответствующий возраст или удалите это поле
+          userAge: 18, // Замените на соответствующий возраст или удалите это поле
           password: this.password
         });
         console.log("Registration successful", response.data);
