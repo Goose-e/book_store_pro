@@ -42,7 +42,7 @@ export default {
     async handleRegistration() {
       console.log(this.username + this.password);
       try {
-        const response = await axios.post('http://localhost:8080/api/v1/auth/signup', {
+        const response = await axios.post('http://localhost :5000/api/v1/auth/signup', {
           login: this.username,
           userAge: 15, // Замените на соответствующий возраст или удалите это поле
           password: this.password
@@ -61,7 +61,109 @@ export default {
 </script>
 
 <style scoped>
-/* Оставьте стиль без изменений */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+  url('../assets/Auth/images/background.jpeg') no-repeat center/cover;
+  z-index: -1;
+}
+
+
+.welcome-text {
+  text-align: center;
+  padding-top: 2rem;
+  font-weight: 200;
+}
+
+.login-container {
+  background: #333;
+  color: #e0e0e0;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+  color: #f2f2f2;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.icon {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  color: #e0e0e0;
+}
+
+.user-icon::before {
+  content: "👤";
+}
+
+.lock-icon::before {
+  content: "🔒";
+}
+
+input {
+  width: 100%;
+  padding: 10px 10px 10px 30px;
+  border: 1px solid #777;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #555;
+  color: white;
+}
+
+.register-button {
+  margin-top: 1rem;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  background-color: #5a5a5a;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.have-account-button {
+  margin-top: 1rem;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+  background-color: #0073e6;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.register-button:hover {
+  background-color: #4a4a4a;
+}
+
+.have-account-button:hover {
+  background-color: #005bb5;
+}
 </style>
 
 <style scoped>
