@@ -42,7 +42,7 @@ export default {
     async handleRegistration() {
       console.log(this.username + this.password);
       try {
-        const response = await axios.post('http://app:5000/api/v1/auth/signup', {
+        const response = await axios.post('http://localhost:8080/api/v1/auth/signup', {
           login: this.username,
           userAge: 15, // Замените на соответствующий возраст или удалите это поле
           password: this.password
