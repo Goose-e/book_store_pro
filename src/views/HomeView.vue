@@ -15,10 +15,9 @@ import Footer from "@/components/Footer.vue";
 
 export default {
   components: {
-    Footer,
     Header,
     HeroSection,
-    BookList
+    BookList,
+    Footer,
   }
-};
-</script>
+};</script>

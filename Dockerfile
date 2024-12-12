@@ -23,7 +23,7 @@ FROM nginx:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Указываем порт, который будет использоваться
-EXPOSE 80
+EXPOSE 5000
 
 # Запускаем Nginx
 CMD ["nginx", "-g", "daemon off;"]

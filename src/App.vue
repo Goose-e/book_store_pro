@@ -8,7 +8,6 @@
 </script>
 
 <style>
-/* Global styles */
 * {
   margin: 0;
   padding: 0;
@@ -18,14 +17,13 @@
 body {
   font-family: Arial, sans-serif;
   color: #333;
-  min-height: 100vh; /* Убедитесь, что body занимает всю высоту экрана */
+  min-height: 100vh;
   display: flex;
-  flex-direction: column; /* Вертикальная ориентация */
+  flex-direction: column;
 }
 
 #app {
-  flex: 1; /* Позволяет вашему основному контенту занимать доступное пространство */
+  flex: 1;
 }
 
-/* Дополнительные стили можно добавить здесь */
 </style>

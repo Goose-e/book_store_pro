@@ -4,7 +4,7 @@
     <div class="social-icons">
       <a href="#">Facebook</a> |
       <a href="#">Twitter</a> |
-      <a href="#">Instagram</a>
+      <a href="https://www.instagram.com/andreinovik59/">Instagram</a>
     </div>
     <p>© 2024 Bookstore. All rights reserved.</p>
   </footer>
@@ -20,6 +20,7 @@ footer {
   color: #fff;
   padding: 1em 0;
   text-align: center;
+
 }
 .social-icons a {
   color: #fff;

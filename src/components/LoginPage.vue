@@ -3,7 +3,7 @@
     <div class="background">
       <div class="welcome-text">
         <h1>Welcome to the Bookstore</h1>
-        <p>Your gateway to a world of books...</p>
+        <p>Welcome text</p>
       </div>
     </div>
     <div class="login-container">
@@ -12,17 +12,18 @@
         <div class="input-group">
           <label for="username">
             <i class="icon user-icon"></i>
-            <input v-model="username" type="text" id="username" placeholder="Username"/>
+            <input type="text" id="username" v-model="username" placeholder="Login" required/>
           </label>
         </div>
         <div class="input-group">
           <label for="password">
             <i class="icon lock-icon"></i>
-            <input v-model="password" type="password" id="password" placeholder="Password"/>
+            <input type="password" id="password" v-model="password" placeholder="Password" required/>
           </label>
         </div>
-        <button type="submit" class="register-button">Log in</button>
-        <button type="button" class="have-account-button" @click="goToSignUp">Sign Up</button>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <button type="submit" class="register-button" @click="handleLogin">Sign In</button>
+        <button type="button" class="have-account-button" @click="goToSignUp">Sign up</button>
       </form>
     </div>
   </div>
@@ -32,34 +33,39 @@
 import axios from 'axios';
 
 export default {
+
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      errorMessage: ''
     };
   },
   methods: {
     async handleLogin() {
       if (this.username && this.password) {
         try {
-
-          await axios.post('http://localhost:5000/api/v1/auth/signin', {
+          const response = await axios.post('http://localhost:8080/api/v1/auth/signin', {
             login: this.username,
             password: this.password
-          })
-              .then(response => {
-                console.log("Login successful", response.data);
-                this.$router.push('/api/v1/bookstore');
-              })
-              .catch(error => {
-                console.error("Login failed:", error.response ? error.response.data : error.message);
-              });
-
+          });
+          const jwt = response.data.accessToken;
+          localStorage.setItem("jwt", jwt);
+          if (response.data.authorities.some(auth => auth.authority === "USER")) {
+            this.$router.push('/api/v1/bookstore');
+          } else {
+            console.log("Its Admin");
+          }
         } catch (error) {
-          console.error("An error occurred during login:", error.message);
+          if (error.response && error.response.status === 400 || error.response.status === 403) {
+            this.errorMessage = "Invalid username or password.";
+          } else {
+
+            console.error("An error occurred during login:", error.message);
+          }
         }
       } else {
-        console.error("Please enter both username and password.");
+        this.errorMessage = "Invalid username or password.";
       }
     },
     goToSignUp() {
@@ -68,7 +74,13 @@ export default {
   }
 };
 </script>
+
 <style scoped>
+.error-message {
+  color: #ff4d4f;
+  margin: 10px 0;
+}
+
 .login-page {
   display: flex;
   justify-content: center;
@@ -86,7 +98,7 @@ export default {
 
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
   url('../assets/Auth/images/background.jpeg') no-repeat center/cover;
-  z-index: -1;
+  z-index: 0;
 }
 
 
@@ -104,6 +116,7 @@ export default {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 300px;
   text-align: center;
+  z-index: 1;
 }
 
 h2 {
@@ -173,5 +186,4 @@ input {
   background-color: #005bb5;
 }
 </style>
-<script setup lang="ts">
-</script>
+
