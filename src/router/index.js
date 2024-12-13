@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import LoginView from "@/views/LoginView.vue";
 import RegistrationView from "@/views/RegistrationView.vue";
-
+import BookView from "@/views/BookView.vue";
 const routes = [
     {
         path: '/',                // Корневой маршрут
@@ -14,13 +14,18 @@ const routes = [
         component: HomeView
     },
     {
-        path: '/api/v1/auth/signin',  // Путь для страницы входа
-        name: 'Login',  // Имя маршрута, без слэша в начале
+        path: '/api/v1/bookstore/bookpage/:bookCode',
+        name: 'bookPage',
+        component: BookView
+    },
+    {
+        path: '/api/v1/auth/signin',
+        name: 'Login',
         component: LoginView
     },
     {
-        path: '/api/v1/auth/signup',  // Путь для страницы входа
-        name: 'Registration',  // Имя маршрута, без слэша в начале
+        path: '/api/v1/auth/signup',
+        name: 'Registration',
         component: RegistrationView
     }
 ];

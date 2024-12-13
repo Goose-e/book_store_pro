@@ -9,9 +9,10 @@
                  class="search-bar" required>
           <ul v-if="filteredBooks.length > 0" class="search-results">
             <li v-for="(book, index) in filteredBooks.slice(0, 15)" :key="book.id" @click="onBookSelect(book)">
-              <img :src="byteArrayToBase64(book.image)" alt="Book Thumbnail" class="book-thumbnail" />
+              <img :src="book.image" alt="Book Thumbnail" class="book-thumbnail"/>
               {{ book.title }}
             </li>
+
             <li v-if="filteredBooks.length > 15">...</li>
           </ul>
 
@@ -19,7 +20,7 @@
       </form>
       <nav>
         <ul>
-          <li><a href="#home">Home</a></li>
+          <li><a href="http://localhost:5173/api/v1/bookstore">Home</a></li>
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
           <li><a href="#cart">Cart</a></li>
@@ -37,6 +38,7 @@
 import axios from "axios";
 import logo from "@/assets/books/logo1.png";
 
+
 export default {
   data() {
 
@@ -44,7 +46,7 @@ export default {
       jwt: localStorage.getItem('jwt'),
       bookName: '',
       searchBookList: [],
-      filteredBooks:[]
+      bookCode: ''
     };
   },
   mounted() {
@@ -61,16 +63,31 @@ export default {
       }
     }
   },
+
   methods: {
+    async onBookSelect(book) {
+      try {
+        this.bookCode = book.code;
+        localStorage.setItem('bookCode', this.bookCode);
+        this.bookName = '';
+        this.$router.push(`/api/v1/bookstore/bookPage/${this.bookCode}`);
+
+
+      } catch (error) {
+        console.error('Ошибка при выборе книги:', error.message);
+      }
+    },
     async getBooks() {
       {
         try {
           const response = await axios.get('http://localhost:8080/api/v1/bookstore/home');
           if (response.data && response.data.responseEntity) {
+            console.log(response)
             this.searchBookList = response.data.responseEntity.listBookDto.map(bookDto => ({
               title: bookDto.bookName,
               price: bookDto.bookPrice,
-              image: logo
+              image: this.byteArrayToBase64(bookDto.image),
+              code: bookDto.code
             }));
           } else {
             this.errorMessage = "Книги не найдены!";
@@ -89,7 +106,6 @@ export default {
       if (!base64String) {
         return logo;
       }
-
       return `data:image/png;base64,${base64String}`;
     },
     async findBook() {
@@ -128,6 +144,10 @@ header {
   background-color: #333;
   color: #fff;
   padding: 1em 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .header-container {
@@ -167,6 +187,8 @@ header {
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
+  z-index: 1000; /* Повышаем приоритет выпадающего списка */
+
 }
 
 .search-results li {
@@ -211,6 +233,7 @@ header {
   cursor: pointer;
   margin-left: 0.5em;
 }
+
 .book-thumbnail {
   width: 30px;
   height: 40px;
@@ -218,6 +241,7 @@ header {
   margin-right: 0.5em;
   border-radius: 4px;
 }
+
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
   .header-container {

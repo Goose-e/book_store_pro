@@ -2,13 +2,13 @@
   <section class="book-list" id="books">
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div class="book-grid" v-else>
-      <div v-for="book in books" :key="book.id" class="book">
-        <div class="book-image">
-          <img :src="book.image" alt="Book Image" />
+      <div v-for="book in books" :key="book.id"  class="book">
+        <div class="book-image" @click="onBookSelect(book)">
+          <img :src="book.image" alt="Book Image"/>
         </div>
         <h3>{{ book.title }}</h3>
         <p>{{ book.price }} $</p>
-        <button class="add-to-cart">Add to Cart</button>
+        <button class="add-to-cart" @click="addToCart(book)">Add to Cart</button>
       </div>
     </div>
   </section>
@@ -23,6 +23,7 @@ export default {
     return {
       books: [],
       errorMessage: "",
+      bookCode: ""
     };
   },
   mounted() {
@@ -40,9 +41,11 @@ export default {
       try {
         const response = await axios.get("http://localhost:8080/api/v1/bookstore/home");
         if (response.data && response.data.responseEntity) {
+          console.log(response)
           this.books = response.data.responseEntity.listBookDto.map(bookDto => ({
             title: bookDto.bookName,
             price: bookDto.bookPrice,
+            code: bookDto.code,
             image: this.byteArrayToBase64(bookDto.image),
           }));
           localStorage.setItem("books", JSON.stringify(this.books)); // Сохраняем данные в localStorage
@@ -58,8 +61,44 @@ export default {
         }
       }
     },
-  },
-};
+    async addToCart(book) {
+      try {
+        if (!(this.books.length === 0)) {
+
+          let bookCode = book.code
+          console.log(bookCode)
+          const token = localStorage.getItem('jwt')
+          const response = (await axios.post("http://localhost:8080/api/v1/cart/addToCart",
+              {bookCode}, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              }))
+          if (response.data) {
+
+          }
+        }
+
+      } catch (error) {
+        console.error("Ошибка в процессе добавления книги в корзину:", error.message);
+        this.errorMessage = "Произошла ошибка при загрузке данных.";
+      }
+    },
+    async onBookSelect(book) {
+      try {
+        console.log(book)
+        this.bookCode = book.code;
+        localStorage.setItem('bookCode', this.bookCode);
+        this.bookName = '';
+        this.$router.push(`/api/v1/bookstore/bookPage/${this.bookCode}`);
+
+
+      } catch (error) {
+        console.error('Ошибка при выборе книги:', error.message);
+      }
+    },
+  }
+}
 </script>
 
 <style scoped>
