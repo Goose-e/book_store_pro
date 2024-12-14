@@ -1,7 +1,7 @@
 <template>
   <header :class="{ 'hidden': isHeaderHidden }">
     <div class="header-container">
-      <img src="../assets/logo.png" alt="Bookstore Logo" @click="goToHome()" class="logo">
+      <img src="../assets/logo/logo.png" alt="Bookstore Logo" @click="goToHome()" class="logo">
       <form @submit.prevent class="header-search-bar">
         <div class="header-search-bar">
           <input type="text" placeholder="Поиск книг..." id="bookName"
