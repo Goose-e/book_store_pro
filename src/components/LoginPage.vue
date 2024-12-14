@@ -22,8 +22,8 @@
           </label>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <button type="submit" class="register-button" @click="handleLogin">Sign In</button>
-        <button type="button" class="have-account-button" @click="goToSignUp">Sign up</button>
+        <button type="submit" class="register-button" @click="handleLogin">Войти</button>
+        <button type="button" class="have-account-button" @click="goToSignUp">Регистрация</button>
       </form>
     </div>
   </div>
@@ -116,7 +116,7 @@ export default {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 300px;
   text-align: center;
-  z-index: 1;
+  z-index: 0;
 }
 
 h2 {

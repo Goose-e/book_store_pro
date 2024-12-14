@@ -2,22 +2,34 @@
   <section class="hero-section">
     <h1>Welcome to Our Bookstore</h1>
     <p>Discover amazing books from various genres!</p>
-    <a href="#books" class="explore-button">Explore Now</a>
+    <a href="#books" class="explore-button" @click="scrollToBooks">Explore Now</a>
   </section>
 </template>
 
 <script>
 export default {
-  name: "HeroSection"
+  name: "HeroSection",
+  methods: {
+    scrollToBooks(event) {
+      event.preventDefault(); // Останавливаем стандартное поведение перехода по ссылке
+      const target = document.getElementById('books'); // Находим элемент с id 'books'
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth', // Плавный скролл
+          block: 'start' // Скроллим до верхней части элемента
+        });
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
-/* Hero Section */
 .hero-section {
   text-align: center;
-  padding: 4em 1em;
+  padding: 8em 1em;
   background-color: #f4f4f4;
+  margin-top: 84px;
 }
 .hero-section h1 {
   font-size: 2.5em;
@@ -36,5 +48,4 @@ export default {
   text-decoration: none;
   border-radius: 5px;
 }
-
 </style>

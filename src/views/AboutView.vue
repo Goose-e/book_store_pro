@@ -1,26 +1,25 @@
 <template>
   <div class="page-container">
-    <Header />
-    <BookPage />
-    <Footer />
+    <Header/>
+    <about/>
+    <Footer/>
   </div>
 </template>
 
 <script>
+
+import About from '../components/About.vue';
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
-import BookPage from "@/components/BookPage.vue";
 
 export default {
   components: {
     Header,
-    BookPage,
+    About,
     Footer,
   }
-};
-</script>
-
-<style scoped>
+};</script>
+<style>
 .page-container {
   display: flex;
   flex-direction: column;
@@ -34,16 +33,8 @@ footer {
   text-align: center;
   margin-top: auto;
 }
-
-.social-icons a {
-  color: #fff;
-  text-decoration: none;
-  margin: 0 0.5em;
-}
-BookPage {
-  flex-grow: 1;
-}
-.book-page{
+About {
   flex-grow: 1;
 }
 </style>
+

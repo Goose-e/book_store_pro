@@ -1,18 +1,19 @@
 <template>
-  <header>
+  <header :class="{ 'hidden': isHeaderHidden }">
     <div class="header-container">
-      <img src="../assets/logo.svg" alt="Bookstore Logo" class="logo">
+      <img src="../assets/logo.png" alt="Bookstore Logo" @click="goToHome()" class="logo">
       <form @submit.prevent class="header-search-bar">
         <div class="header-search-bar">
-          <input type="text" placeholder="Search for books..." id="bookName"
+          <input type="text" placeholder="Поиск книг..." id="bookName"
                  v-model="bookName"
-                 class="search-bar" required>
-          <ul v-if="filteredBooks.length > 0" class="search-results">
+                 class="search-bar"
+                 autocomplete="off"
+                 required>
+          <ul v-if="filteredBooks.length > 0 && isSearchResultsVisible" class="search-results">
             <li v-for="(book, index) in filteredBooks.slice(0, 15)" :key="book.id" @click="onBookSelect(book)">
               <img :src="book.image" alt="Book Thumbnail" class="book-thumbnail"/>
               {{ book.title }}
             </li>
-
             <li v-if="filteredBooks.length > 15">...</li>
           </ul>
 
@@ -20,10 +21,10 @@
       </form>
       <nav>
         <ul>
-          <li><a href="http://localhost:5173/api/v1/bookstore">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <li><a href="#cart">Cart</a></li>
+          <li><a href="http://localhost:5173/api/v1/bookstore">Главная</a></li>
+          <li><a href="http://localhost:5173/api/v1/bookstore/about">О нас</a></li>
+          <li><a href="http://localhost:5173/api/v1/bookstore/contact">Контакты</a></li>
+          <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/cart">Корзина</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -38,19 +39,24 @@
 import axios from "axios";
 import logo from "@/assets/books/logo1.png";
 
-
 export default {
   data() {
-
     return {
       jwt: localStorage.getItem('jwt'),
       bookName: '',
       searchBookList: [],
-      bookCode: ''
+      bookCode: '',
+      lastScrollPosition: 0,
+      isHeaderHidden: false,
+      isSearchResultsVisible: true,
     };
   },
   mounted() {
     this.getBooks();
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
   computed: {
     filteredBooks() {
@@ -63,43 +69,47 @@ export default {
       }
     }
   },
-
   methods: {
+    goToHome() {
+      this.$router.push('/api/v1/bookstore'); // Путь к главной странице
+    },
+    handleScroll() {
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+      // Прячем хедер при прокрутке вниз
+      this.isHeaderHidden = currentScrollPosition > this.lastScrollPosition;
+
+      // Прячем результаты поиска, если прокручено вниз
+      this.isSearchResultsVisible = currentScrollPosition === 0; // Показывать меню только на верхней части страницы
+
+      this.lastScrollPosition = currentScrollPosition <= 0 ? 0 : currentScrollPosition;
+    },
     async onBookSelect(book) {
       try {
         this.bookCode = book.code;
         localStorage.setItem('bookCode', this.bookCode);
         this.bookName = '';
         this.$router.push(`/api/v1/bookstore/bookPage/${this.bookCode}`);
-
-
       } catch (error) {
         console.error('Ошибка при выборе книги:', error.message);
       }
     },
     async getBooks() {
-      {
-        try {
-          const response = await axios.get('http://localhost:8080/api/v1/bookstore/home');
-          if (response.data && response.data.responseEntity) {
-            console.log(response)
-            this.searchBookList = response.data.responseEntity.listBookDto.map(bookDto => ({
-              title: bookDto.bookName,
-              price: bookDto.bookPrice,
-              image: this.byteArrayToBase64(bookDto.image),
-              code: bookDto.code
-            }));
-          } else {
-            this.errorMessage = "Книги не найдены!";
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 400) {
-            this.errorMessage = "Ошибка на сервере.";
-          } else {
-            console.error("Ошибка в процессе загрузки книг:", error.message);
-            this.errorMessage = "Произошла ошибка при загрузке данных.";
-          }
+      try {
+        const response = await axios.get('http://localhost:8080/api/v1/bookstore/home');
+        if (response.data && response.data.responseEntity) {
+          this.searchBookList = response.data.responseEntity.listBookDto.map(bookDto => ({
+            title: bookDto.bookName,
+            price: bookDto.bookPrice,
+            image: this.byteArrayToBase64(bookDto.image),
+            code: bookDto.code
+          }));
+        } else {
+          this.errorMessage = "Книги не найдены!";
         }
+      } catch (error) {
+        console.error("Ошибка в процессе загрузки книг:", error.message);
+        this.errorMessage = "Произошла ошибка при загрузке данных.";
       }
     },
     byteArrayToBase64(base64String) {
@@ -108,33 +118,15 @@ export default {
       }
       return `data:image/png;base64,${base64String}`;
     },
-    async findBook() {
-      try {
-        if (this.bookName) {
-
-          let findBook = this.bookName
-          const response = await axios.get('http://localhost:8080/api/v1/bookstore/getByBookName/' + findBook);
-          console.log(response)
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 400) {
-          this.errorMessage = "Ошибка на сервере.";
-        } else {
-          console.error("Ошибка в процессе загрузки книг:", error.message);
-          this.errorMessage = "Произошла ошибка при загрузке данных.";
-        }
-      }
-    },
     async logout() {
       localStorage.clear();
-      this.jwt = null
-      location.reload()
+      this.jwt = null;
+      location.reload();
     },
     async login() {
       this.$router.push('/api/v1/auth/signin');
     }
   }
-
 };
 </script>
 
@@ -148,6 +140,11 @@ header {
   top: 0;
   width: 100%;
   z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+}
+
+header.hidden {
+  transform: translateY(-100%);
 }
 
 .header-container {
@@ -155,15 +152,16 @@ header {
   align-items: center;
   justify-content: space-between;
   max-width: 1200px;
+  position: relative;
   margin: 0 auto;
   padding: 0 1em;
-  flex-wrap: wrap; /* Для адаптации на мобильных */
+  flex-wrap: wrap;
 }
 
-.header-container .logo {
-  height: 40px;
+.logo{
+  height: 60px;
+  cursor: pointer;
 }
-
 .header-search-bar {
   flex-grow: 1;
   margin: 0 1em;
@@ -187,8 +185,7 @@ header {
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
-  z-index: 1000; /* Повышаем приоритет выпадающего списка */
-
+  z-index: 1000;
 }
 
 .search-results li {
@@ -196,7 +193,7 @@ header {
   align-items: center;
   padding: 0.5em;
   border-bottom: 1px solid #ccc;
-  cursor: pointer;
+  cursor: pointer; /* Добавляем стиль для изменения курсора */
 }
 
 .search-results li:last-child {

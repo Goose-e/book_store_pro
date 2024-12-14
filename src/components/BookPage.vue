@@ -4,6 +4,9 @@
       <!-- Картинка книги слева -->
       <div class="book-image-container">
         <img :src="book.image" alt="Book Image" class="book-image"/>
+        <div class="book-price" style="margin-top: 30px">
+          <span> {{ book.price }}$</span>
+        </div>
         <button class="add-to-cart" @click="addToCart">Положить в корзину</button>
       </div>
 
@@ -50,6 +53,7 @@ export default {
         availability: '',
         description: '',
         bookCode: '',
+        price:''
       },
     };
   },
@@ -82,6 +86,7 @@ export default {
             image: this.byteArrayToBase64(response.data.responseEntity.image),
             description: response.data.responseEntity.bookDescription,
             bookCode: response.data.responseEntity.bookCode,
+            price: response.data.responseEntity.bookPrice
           };
 
         } else {
@@ -99,21 +104,23 @@ export default {
       return `data:image/png;base64,${base64String}`;
     },
     async addToCart() {
-
-
       try {
         let bookCode = this.$route.params.bookCode;
         const token = localStorage.getItem('jwt')
-        const response = (await axios.post("http://localhost:8080/api/v1/cart/addToCart",
-            {bookCode}, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
+        if (token != null) {
+          const response = (await axios.post("http://localhost:8080/api/v1/cart/addToCart",
+              {bookCode}, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
 
-            }))
+              }))
 
-        if (response.data) {
-          alert(`Added "${this.book.title}" to cart!`);
+          if (response.data) {
+            alert(`Added "${this.book.title}" to cart!`);
+          }
+        }else {
+          alert("необходимо авторизоваться")
         }
       } catch (error) {
         console.error("Ошибка в процессе добавления книги в корзину:", error.message);
@@ -130,23 +137,27 @@ export default {
   background-color: #2f2f2f;
   color: #fff;
   padding: 20px;
+  margin-top: 80px; /* Добавляем отступ сверху, чтобы контент не перекрывался хедером */
 }
 
 .book-container {
   display: flex;
   justify-content: space-between;
   padding: 20px;
+
 }
 
 .book-image-container {
   flex: 1;
   max-width: 250px;
+
 }
 
 .book-image {
   width: 100%;
   height: auto;
   border-radius: 10px;
+
 }
 
 .book-info {
@@ -182,6 +193,8 @@ export default {
 }
 
 .add-to-cart {
+  margin-top: 30px;
+  margin-left: 30px;
   padding: 10px 20px;
   font-size: 1em;
   color: #fff;
@@ -190,7 +203,10 @@ export default {
   border-radius: 5px;
   cursor: pointer;
 }
-
+.book-price{
+  align-items: center;
+  margin-left: 110px;
+}
 .add-to-cart:hover {
   background-color: #2980b9;
 }
@@ -213,5 +229,6 @@ export default {
     max-width: 80%;
   }
 }
+
 </style>
 

@@ -22,8 +22,8 @@
           </label>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <button type="submit" class="register-button">Sign Up</button>
-        <button type="button" class="have-account-button" @click="goToSignIn">Have an account?</button>
+        <button type="submit" class="register-button">Зарегистрироваться</button>
+        <button type="button" class="have-account-button" @click="goToSignIn">Есть аккаунт</button>
       </form>
     </div>
   </div>

@@ -20,11 +20,13 @@ footer {
   color: #fff;
   padding: 1em 0;
   text-align: center;
-
+  width: 100%;
+  margin-top: auto; /* Располагает футер внизу страницы */
 }
 .social-icons a {
   color: #fff;
   text-decoration: none;
   margin: 0 0.5em;
 }
+
 </style>
