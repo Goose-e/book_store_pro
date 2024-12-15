@@ -1,4 +1,5 @@
 <template>
+  <div class = "page-container-home">
   <section class="book-list" id="books">
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div class="book-grid" v-else>
@@ -11,7 +12,7 @@
         <button class="add-to-cart"  @click="addToCart(book)">Add to Cart</button>
       </div>
     </div>
-  </section>
+  </section></div>
 </template>
 
 <script>
@@ -178,6 +179,58 @@ p {
 
 .add-to-cart:hover {
   background-color: #005bb5;
+}
+@media (max-width: 768px) {
+  .book-grid {
+    grid-template-columns: repeat(2, 1fr); /* Два столбца для планшетов */
+    gap: 0.5em; /* Уменьшенные отступы */
+  }
+
+  .book {
+    padding: 0.5em;
+    margin: 2px;
+    border-radius: 6px;
+  }
+
+  .book-image img {
+    height: 200px; /* Уменьшение высоты изображения для небольших экранов */
+  }
+
+  h3 {
+    font-size: 1em; /* Меньший шрифт */
+  }
+
+  p {
+    font-size: 0.9em;
+  }
+
+  .add-to-cart {
+    padding: 0.4em;
+    font-size: 0.9em; /* Меньше текста на кнопке */
+  }
+}
+
+@media (max-width: 480px) {
+  .book-grid {
+    grid-template-columns: 1fr; /* Один столбец для телефонов */
+  }
+
+  .book {
+    padding: 0.5em;
+    margin: 5px;
+  }
+
+  .book-image img {
+    height: 150px; /* Ещё меньше высота для телефонов */
+  }
+
+  h3, p {
+    font-size: 0.8em; /* Уменьшение текста для телефонов */
+  }
+
+  .add-to-cart {
+    font-size: 0.8em;
+  }
 }
 
 </style>

@@ -87,8 +87,10 @@ export default {
       try {
         const token = localStorage.getItem('jwt');
         let code = item.code
+        console.log(item.quantity)
         let quantity = item.quantity
-        await axios.post(
+        console.log(quantity)
+        const response = await axios.post(
             `http://localhost:8080/api/v1/cart/changeQuantity`,
             {
               cartItemCode: code,
@@ -100,7 +102,11 @@ export default {
               },
             }
         );
-        console.log(`Количество для книги "${item.title}" обновлено.`);
+        console.log(response)
+        if (response.data.message === "Too much") {
+          item.quantity -= 1
+          alert("Больше нет на складе")
+        }
       } catch (error) {
         console.error("Ошибка синхронизации количества:", error.message);
       }
@@ -138,6 +144,7 @@ export default {
     },
     increaseQuantity(index) {
       this.cartItems[index].quantity += 1;
+      console.log( this.cartItems[index].quantity)
     },
     decreaseQuantity(index) {
       if (this.cartItems[index].quantity > 1) {
@@ -315,128 +322,4 @@ export default {
   }
 }
 </style>
-
-
-<!--<script>-->
-<!--import axios from "axios";-->
-<!--import logo from "@/assets/books/logo1.png";-->
-
-<!--export default {-->
-<!--  data() {-->
-<!--    return {-->
-<!--      cartItems: [],-->
-<!--    };-->
-<!--  },-->
-<!--  computed: {-->
-<!--    totalAmount() {-->
-<!--      return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);-->
-<!--    },-->
-<!--  },-->
-<!--  mounted() {-->
-<!--    this.getCartItems();-->
-<!--  },-->
-<!--  watch: {-->
-<!--    cartItems: {-->
-<!--      handler(newValue) {-->
-<!--        newValue.forEach((item) => {-->
-<!--          if (item.quantity > 0) {-->
-<!--            this.syncCartItemQuantity(item);-->
-<!--          }-->
-<!--        });-->
-<!--      },-->
-<!--      deep: true,-->
-<!--    },-->
-
-<!--  },-->
-<!--  methods: {-->
-
-<!--    async syncCartItemQuantity(item) {-->
-<!--      try {-->
-<!--        const token = localStorage.getItem('jwt');-->
-<!--        let code = item.code-->
-<!--        let quantity = item.quantity-->
-<!--        await axios.put(-->
-<!--            `http://localhost:8080/api/v1/cart/changeQuantity/`,-->
-<!--            {-->
-<!--              cartItemCode: code,-->
-<!--              quantity: quantity-->
-<!--            },-->
-<!--            {-->
-<!--              headers: {-->
-<!--                Authorization: `Bearer ${token}`,-->
-<!--              },-->
-<!--            }-->
-<!--        );-->
-<!--        console.log(`Количество для книги "${item.title}" обновлено.`);-->
-<!--      } catch (error) {-->
-<!--        console.error("Ошибка синхронизации количества:", error.message);-->
-<!--      }-->
-<!--    },-->
-<!--    async getCartItems() {-->
-<!--      try {-->
-<!--        const token = localStorage.getItem('jwt')-->
-<!--        const response = await axios.get("http://localhost:8080/api/v1/cart/getItemList", {-->
-<!--          headers: {-->
-<!--            'Authorization': `Bearer ${token}`-->
-<!--          }-->
-<!--        });-->
-<!--        if (response.data && response.data.responseEntity) {-->
-<!--          console.log(response)-->
-<!--          this.cartItems = response.data.responseEntity.listBookDto.map(bookDto => ({-->
-<!--            title: bookDto.bookName,-->
-<!--            price: bookDto.bookPrice,-->
-<!--            genre: bookDto.bookGenre,-->
-<!--            code: bookDto.itemCode,-->
-<!--            image: this.byteArrayToBase64(bookDto.image),-->
-<!--            quantity: bookDto.itemQuantity-->
-<!--          }));-->
-<!--          localStorage.setItem("books", JSON.stringify(this.books)); // Сохраняем данные в localStorage-->
-<!--        } else {-->
-<!--          this.errorMessage = "Книги не найдены!";-->
-<!--        }-->
-<!--      } catch (error) {-->
-<!--        if (error.response && error.response.status === 400) {-->
-<!--          this.errorMessage = "Ошибка на сервере.";-->
-<!--        } else {-->
-<!--          console.error("Ошибка в процессе загрузки книг:", error.message);-->
-<!--          this.errorMessage = "Произошла ошибка при загрузке данных.";-->
-<!--        }-->
-<!--      }-->
-<!--    },-->
-<!--    increaseQuantity(index) {-->
-<!--      this.cartItems[index].quantity += 1;-->
-
-<!--    },-->
-<!--    decreaseQuantity(index) {-->
-<!--      if (this.cartItems[index].quantity > 1) {-->
-<!--        this.cartItems[index].quantity -= 1;-->
-<!--      }-->
-<!--    },-->
-
-<!--    updateQuantity(index) {-->
-<!--      if (this.cartItems[index].quantity < 1) {-->
-<!--        this.cartItems[index].quantity = 1;-->
-<!--      }-->
-<!--    },-->
-
-<!--    removeItem(index) {-->
-<!--      this.cartItems.splice(index, 1);-->
-<!--    },-->
-<!--    byteArrayToBase64(base64String) {-->
-<!--      if (!base64String) {-->
-<!--        return logo;-->
-<!--      }-->
-
-<!--      return `data:image/png;base64,${base64String}`;-->
-<!--    },-->
-<!--    checkout() {-->
-<!--      alert('Заказ оформлен!');-->
-<!--      this.cartItems = [];-->
-<!--    },-->
-<!--  },-->
-<!--};-->
-<!--</script>-->
-
-
-
 

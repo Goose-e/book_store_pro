@@ -48,11 +48,9 @@ export default {
 <style scoped>
 
 .about-us {
-
   max-width: 1200px;
   margin: 30px auto;
   padding: 3em 1em;
-  flex-grow: 1;
 
 }
 

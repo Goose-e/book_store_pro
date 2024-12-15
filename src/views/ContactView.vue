@@ -32,6 +32,7 @@ footer {
   padding: 1em 0;
   text-align: center;
   margin-top: auto;
+
 }
 Contact {
   flex-grow: 1;

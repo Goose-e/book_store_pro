@@ -22,5 +22,19 @@ export default {
   }
 };</script>
 <style>
+.page-container-home {
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 1em 0;
+  text-align: center;
+  margin-top: auto;
+
+}
 
 </style>
