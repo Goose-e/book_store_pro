@@ -23,15 +23,15 @@
           <p>{{ item.genre }}</p>
         </div>
         <div class="cart-cell">
-          <p>{{ item.price }} руб.</p>
+          <p>{{ item.price }}$</p>
         </div>
         <div class="cart-cell quantity-controls">
-          <button @click="decreaseQuantity(index)" :disabled="item.quantity <= 1">-</button>
-          <input type="number" v-model.number="item.quantity" min="1" @change="updateQuantity(index)"/>
-          <button @click="increaseQuantity(index)">+</button>
+
+          <input type="number" v-model.number="item.quantity" min="1" @change="updateQuantity(index)" @keydown.prevent/>
+
         </div>
         <div class="cart-cell">
-          <p>{{ (item.price * item.quantity).toFixed(2) }} руб.</p>
+          <p>{{ (item.price * item.quantity).toFixed(2) }}$</p>
         </div>
         <div class="cart-cell">
           <button @click="removeItem(index)" class="remove-button">Удалить</button>
@@ -39,7 +39,7 @@
       </div>
 
       <div class="cart-summary">
-        <h2>Общая стоимость: {{ totalAmount.toFixed(2) }} руб.</h2>
+        <h2>Общая стоимость: {{ totalAmount.toFixed(2) }}$</h2>
         <button class="checkout-button" @click="checkout">Оформить заказ</button>
       </div>
     </div>
@@ -68,21 +68,32 @@ export default {
   },
   mounted() {
     this.getCartItems();
+    if(localStorage.getItem('jwt') == null){
+      this.$router.push(`/api/v1/bookstore`);
+    }
   },
   watch: {
     cartItems: {
       handler(newValue) {
         newValue.forEach((item) => {
-          if (item.quantity > 0) {
-            this.syncCartItemQuantity(item);
-          }
-        });
+              if (item.quantity > 0) {
+                this.syncCartItemQuantity(item);
+              }
+            }
+        );
+        this.updateTotalPrice();
+        console.log(localStorage.getItem('price'))
       },
       deep: true,
     },
 
   },
   methods: {
+    async updateTotalPrice() {
+      const totalPrice = this.totalAmount.toFixed(2).toString(); // Получаем общую сумму
+      localStorage.setItem('price', totalPrice);
+      console.log("ffff"+localStorage.getItem('price'))
+    },
     async syncCartItemQuantity(item) {
       try {
         const token = localStorage.getItem('jwt');
@@ -105,7 +116,6 @@ export default {
         console.log(response)
         if (response.data.message === "Too much") {
           item.quantity -= 1
-          alert("Больше нет на складе")
         }
       } catch (error) {
         console.error("Ошибка синхронизации количества:", error.message);
@@ -140,15 +150,6 @@ export default {
           console.error("Ошибка в процессе загрузки книг:", error.message);
           this.errorMessage = "Произошла ошибка при загрузке данных.";
         }
-      }
-    },
-    increaseQuantity(index) {
-      this.cartItems[index].quantity += 1;
-      console.log( this.cartItems[index].quantity)
-    },
-    decreaseQuantity(index) {
-      if (this.cartItems[index].quantity > 1) {
-        this.cartItems[index].quantity -= 1;
       }
     },
     updateQuantity(index) {
@@ -192,9 +193,9 @@ export default {
 
       return `data:image/png;base64,${base64String}`;
     },
-    checkout() {
-      alert('Заказ оформлен!');
-      this.cartItems = [];
+    async checkout() {
+      this.$router.push('/api/v1/bookstore/order');
+
     },
   },
 };

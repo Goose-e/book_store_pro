@@ -5,9 +5,11 @@
 </template>
 
 <script>
-import LoginPage from "@/components/LoginPage.vue";
-
+import LoginPage from "@/components/usersFunctions/auth/LoginPage.vue";
 export default {
+  mounted() {
+    document.title = "Авторизация";
+  },
   components: {
     LoginPage
   }

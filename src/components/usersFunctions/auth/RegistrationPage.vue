@@ -3,37 +3,36 @@
     <div class="background">
       <div class="welcome-text">
         <h1>Welcome to the Bookstore</h1>
-        <p>Welcome text</p>
+        <p>Create your account</p>
       </div>
     </div>
     <div class="login-container">
-      <h2>User Login</h2>
-      <form @submit.prevent="handleLogin">
+      <h2>User Registration</h2>
+      <form @submit.prevent="handleRegistration">
         <div class="input-group">
           <label for="username">
             <i class="icon user-icon"></i>
-            <input type="text" id="username" v-model="username" placeholder="Login" required/>
+            <input type="text" id="username" v-model="username" placeholder="Create username" required/>
           </label>
         </div>
         <div class="input-group">
           <label for="password">
             <i class="icon lock-icon"></i>
-            <input type="password" id="password" v-model="password" placeholder="Password" required/>
+            <input type="password" id="password" v-model="password" placeholder="Create password" required/>
           </label>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <button type="submit" class="register-button" @click="handleLogin">Войти</button>
-        <button type="button" class="have-account-button" @click="goToSignUp">Регистрация</button>
+        <button type="submit" class="register-button">Зарегистрироваться</button>
+        <button type="button" class="have-account-button" @click="goToSignIn">Есть аккаунт</button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
-
   data() {
     return {
       username: '',
@@ -42,45 +41,40 @@ export default {
     };
   },
   methods: {
-    async handleLogin() {
-      if (this.username && this.password) {
-        try {
-          const response = await axios.post('http://localhost:8080/api/v1/auth/signin', {
-            login: this.username,
-            password: this.password
-          });
-          const jwt = response.data.accessToken;
-          localStorage.setItem("jwt", jwt);
-          if (response.data.authorities.some(auth => auth.authority === "USER")) {
-            this.$router.push('/api/v1/bookstore');
-          } else {
-            console.log("Its Admin");
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 400 || error.response.status === 403) {
-            this.errorMessage = "Invalid username or password.";
-          } else {
-
-            console.error("An error occurred during login:", error.message);
-          }
+    async handleRegistration() {
+      console.log(this.username + this.password);
+      try {
+        const response = await axios.post('http://localhost:8080/api/v1/auth/signup', {
+          login: this.username,
+          userAge: 18,
+          password: this.password
+        });
+        if (response.data["responseCode"] === "OC_BUGS" && response.data["message"] === "User already exist") {
+          this.errorMessage = "User already exist.";
         }
-      } else {
-        this.errorMessage = "Invalid username or password.";
+        else {
+          console.log("Registration successful", response.data);
+          this.$router.push('/api/v1/auth/signin');
+        }
+      } catch (error) {
+
+        // Другая ошибка, например, сеть или серверная ошибка
+        console.error("An error occurred during registration:", error.message);
+
       }
+
     },
-    goToSignUp() {
-      this.$router.push('/api/v1/auth/signup');
+    goToSignIn() {
+      this.$router.push('/api/v1/auth/signin');// Убедитесь, что путь соответствует вашим маршрутам
     }
   }
-};
+}
+;
 </script>
 
-<style scoped>
-.error-message {
-  color: #ff4d4f;
-  margin: 10px 0;
-}
 
+
+<style scoped>
 .login-page {
   display: flex;
   justify-content: center;
@@ -97,7 +91,7 @@ export default {
   height: 100%;
 
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-  url('../assets/Auth/images/background.jpeg') no-repeat center/cover;
+  url('../../../assets/Auth/images/background.jpeg') no-repeat center/cover;
   z-index: 0;
 }
 
@@ -116,7 +110,7 @@ export default {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 300px;
   text-align: center;
-  z-index: 0;
+  z-index: 1;
 }
 
 h2 {
@@ -186,4 +180,3 @@ input {
   background-color: #005bb5;
 }
 </style>
-

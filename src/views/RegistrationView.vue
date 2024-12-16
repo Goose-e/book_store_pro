@@ -5,9 +5,12 @@
 </template>
 
 <script>
-import RegistrationPage from "@/components/RegistrationPage.vue";
+import RegistrationPage from "@/components/usersFunctions/auth/RegistrationPage.vue";
 
 export default {
+  mounted() {
+    document.title = "Регистрация";
+  },
   components: {
     RegistrationPage
   }

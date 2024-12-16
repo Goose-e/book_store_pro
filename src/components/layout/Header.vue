@@ -1,14 +1,16 @@
 <template>
   <header :class="{ 'hidden': isHeaderHidden }">
     <div class="header-container">
-      <img src="../assets/logo/logo.png" alt="Bookstore Logo" @click="goToHome()" class="logo">
+      <img src="../../assets/logo/logo.png" alt="Bookstore Logo" @click="goToHome()" class="logo">
       <form @submit.prevent class="header-search-bar">
         <div class="header-search-bar">
           <input type="text" placeholder="Поиск книг..." id="bookName"
                  v-model="bookName"
                  class="search-bar"
                  autocomplete="off"
-                 required>
+                 required
+                 @keydown.enter="onSearchEnter"
+          >
           <ul v-if="filteredBooks.length > 0 && isSearchResultsVisible" class="search-results">
             <li v-for="(book, index) in filteredBooks.slice(0, 15)" :key="book.id" @click="onBookSelect(book)">
               <img :src="book.image" alt="Book Thumbnail" class="book-thumbnail"/>
@@ -25,6 +27,7 @@
           <li><a href="http://localhost:5173/api/v1/bookstore/about">О нас</a></li>
           <li><a href="http://localhost:5173/api/v1/bookstore/contact">Контакты</a></li>
           <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/cart">Корзина</a></li>
+          <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/orderList">Заказы</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -67,20 +70,17 @@ export default {
             book.title.toLowerCase().includes(this.bookName.toLowerCase())
         );
       }
-    }
+    },
   },
   methods: {
     goToHome() {
-      this.$router.push('/api/v1/bookstore'); // Путь к главной странице
+      this.$router.push('/api/v1/bookstore');
     },
     handleScroll() {
       const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
-      // Прячем хедер при прокрутке вниз
       this.isHeaderHidden = currentScrollPosition > this.lastScrollPosition;
-
-      // Прячем результаты поиска, если прокручено вниз
-      this.isSearchResultsVisible = currentScrollPosition === 0; // Показывать меню только на верхней части страницы
+      this.isSearchResultsVisible = currentScrollPosition < this.lastScrollPosition
 
       this.lastScrollPosition = currentScrollPosition <= 0 ? 0 : currentScrollPosition;
     },
@@ -125,7 +125,14 @@ export default {
     },
     async login() {
       this.$router.push('/api/v1/auth/signin');
+    },
+    onSearchEnter() {
+      if (this.bookName.trim() !== '') {
+        this.$router.push(`/api/v1/bookstore/searchBooks/${this.bookName}`);
+
+      }
     }
+
   }
 };
 </script>
@@ -158,10 +165,11 @@ header.hidden {
   flex-wrap: wrap;
 }
 
-.logo{
+.logo {
   height: 60px;
   cursor: pointer;
 }
+
 .header-search-bar {
   flex-grow: 1;
   margin: 0 1em;

@@ -1,29 +1,28 @@
 <template>
   <div class="page-container">
-    <Header />
-    <BookPage />
-    <Footer />
+    <Header/>
+    <Order/>
+    <Footer/>
   </div>
 </template>
 
 <script>
+
+import Order from '../components/usersFunctions/shopping/order/Order.vue';
 import Header from "@/components/layout/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
-import BookPage from "@/components/usersFunctions/book/BookPage.vue";
 
 export default {
   mounted() {
-    document.title = "Книга";
+    document.title = "Оформление заказа";
   },
   components: {
     Header,
-    BookPage,
+    Order,
     Footer,
   }
-};
-</script>
-
-<style scoped>
+};</script>
+<style>
 .page-container {
   display: flex;
   flex-direction: column;
@@ -37,16 +36,8 @@ footer {
   text-align: center;
   margin-top: auto;
 }
-
-.social-icons a {
-  color: #fff;
-  text-decoration: none;
-  margin: 0 0.5em;
-}
-BookPage {
-  flex-grow: 1;
-}
-.book-page{
+Order {
   flex-grow: 1;
 }
 </style>
+

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import LoginView from "@/views/LoginView.vue";
 import RegistrationView from "@/views/RegistrationView.vue";
@@ -6,6 +6,9 @@ import BookView from "@/views/BookView.vue";
 import AboutView from "@/views/AboutView.vue";
 import ContactView from "@/views/ContactView.vue";
 import CartView from "@/views/CartView.vue";
+import OrderPage from "@/views/OrderView.vue";
+import OrderListView from "@/views/orderListView.vue";
+import FoundBooks from "@/views/FoundBooksView.vue";
 const routes = [
     {
         path: '/',                // Корневой маршрут
@@ -17,7 +20,22 @@ const routes = [
         component: HomeView
     },
     {
-        path: '/api/v1/bookstore/bookpage/:bookCode',
+        path: "/api/v1/bookstore/order",
+        name: "OrderPage",
+        component: OrderPage,
+    },
+    {
+        path: "/api/v1/bookstore/orderList",
+        name: "OrderListPage",
+        component: OrderListView,
+    },
+    {
+        path: "/api/v1/bookstore/searchBooks/:bookName",
+        name: "FoundBooks",
+        component: FoundBooks,
+    },
+    {
+        path: '/api/v1/bookstore/bookPage/:bookCode',
         name: 'bookPage',
         component: BookView
     },

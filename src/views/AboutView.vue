@@ -8,11 +8,14 @@
 
 <script>
 
-import About from '../components/About.vue';
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
+import About from '../components/infoPages/About.vue';
+import Header from "@/components/layout/Header.vue";
+import Footer from "@/components/layout/Footer.vue";
 
 export default {
+  mounted() {
+    document.title = "О нас";
+  },
   components: {
     Header,
     About,

@@ -1,26 +1,28 @@
 <template>
   <div class="page-container">
     <Header/>
-    <Cart/>
+    <foundBookPage/>
     <Footer/>
   </div>
 </template>
+
 <script>
-import Cart from '@/components/usersFunctions/shopping/cart/Cart.vue';
+import HeroSection from '../components/mainPage/HeroSection.vue';
+import foundBookPage  from '../components/usersFunctions/book/FindedBookPage.vue';
 import Header from "@/components/layout/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
+
 export default {
   mounted() {
-    document.title = "Корзина";
+    document.title = "Поиск книг";
   },
   components: {
     Header,
-    Cart,
+    foundBookPage,
     Footer,
   }
-};
-</script>
-<style scoped>
+};</script>
+<style>
 body, html {
   margin: 0;
   padding: 0;
@@ -43,4 +45,5 @@ footer {
   text-align: center;
   padding: 1em 0;
 }
+
 </style>

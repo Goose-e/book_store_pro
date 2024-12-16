@@ -8,12 +8,15 @@
 </template>
 
 <script>
-import HeroSection from '../components/HeroSection.vue';
-import BookList from '../components/BookList.vue';
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
+import HeroSection from '../components/mainPage/HeroSection.vue';
+import BookList from '../components/mainPage/BookList.vue';
+import Header from "@/components/layout/Header.vue";
+import Footer from "@/components/layout/Footer.vue";
 
 export default {
+  mounted() {
+    document.title = "Главная";
+  },
   components: {
     Header,
     HeroSection,

@@ -7,11 +7,14 @@
 </template>
 
 <script>
-import Header from "@/components/Header.vue";
-import Footer from "@/components/Footer.vue";
-import Contact from "@/components/Contact.vue";
+import Header from "@/components/layout/Header.vue";
+import Footer from "@/components/layout/Footer.vue";
+import Contact from "@/components/infoPages/Contact.vue";
 
 export default {
+  mounted() {
+    document.title = "Контакты";
+  },
   components: {
     Header,
     Contact,

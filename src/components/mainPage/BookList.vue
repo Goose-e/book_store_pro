@@ -1,18 +1,19 @@
 <template>
-  <div class = "page-container-home">
-  <section class="book-list" id="books">
-    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-    <div class="book-grid" v-else>
-      <div v-for="book in books" :key="book.id" class="book" @click="onBookSelect(book)" >
-        <div class="book-image" @click="onBookSelect(book)">
-          <img :src="book.image" alt="Book Image"/>
+  <div class="page-container-home">
+    <section class="book-list" id="books">
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <div class="book-grid" v-else>
+        <div v-for="book in books" :key="book.id" class="book" @click="onBookSelect(book)">
+          <div class="book-image" @click="onBookSelect(book)">
+            <img :src="book.image" alt="Book Image"/>
+          </div>
+          <h3>{{ book.title }}</h3>
+          <p>{{ book.price }} $</p>
+          <button class="add-to-cart" @click="addToCart(book)">Add to Cart</button>
         </div>
-        <h3>{{ book.title }}</h3>
-        <p>{{ book.price }} $</p>
-        <button class="add-to-cart"  @click="addToCart(book)">Add to Cart</button>
       </div>
-    </div>
-  </section></div>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -70,16 +71,16 @@ export default {
           let bookCode = book.code
           console.log(bookCode)
           const token = localStorage.getItem('jwt')
-          if (token != null){
-          const response = (await axios.post("http://localhost:8080/api/v1/cart/addToCart",
-              {bookCode}, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              }))}
-          else {
+          if (token != null) {
+            const response = (await axios.post("http://localhost:8080/api/v1/cart/addToCart",
+                {bookCode}, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                }))
+          } else {
             alert("Необходимо авторизоваться")
-           //this.$router.push('/api/v1/auth/signin');
+            //this.$router.push('/api/v1/auth/signin');
           }
 
         }
@@ -180,6 +181,7 @@ p {
 .add-to-cart:hover {
   background-color: #005bb5;
 }
+
 @media (max-width: 768px) {
   .book-grid {
     grid-template-columns: repeat(2, 1fr); /* Два столбца для планшетов */
