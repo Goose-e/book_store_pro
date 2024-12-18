@@ -2,7 +2,7 @@
   <div class="book-page">
     <div class="book-container">
       <div class="book-image-container">
-        <img :src="book.image" alt="Book Image" class="book-image" @click="editImage" />
+        <img :src="book.image" alt="Book Image" class="book-image" @click="editImage"/>
         <div class="book-price" style="margin-top: 30px">
           <input v-if="isEditing" type="text" v-model="book.price" required/>
           <span v-else> {{ book.price }}$</span>
@@ -10,7 +10,7 @@
         <button v-if="!isEditing" class="add-to-cart" @click="addToCart">Положить в корзину</button>
 
         <div v-if="isEditing">
-          <input type="file" @change="handleFileChange" />
+          <input type="file" @change="handleFileChange"/>
         </div>
       </div>
 
@@ -29,12 +29,19 @@
 
         <p class="book-author">
           <input v-if="isEditing" type="text" v-model="book.author" required/>
-          <span v-else>{{ book.author }}</span>
+          <span v-else>автор: {{ book.author }}</span>
         </p>
-
+        <p class="book-pages">
+          <input v-if="isEditing" type="text" v-model="book.pages" required/>
+          <span v-else>страниц: {{ book.pages }}</span>
+        </p>
+        <p class="book-genre">
+          <input v-if="isEditing" type="text" v-model="book.genre" required/>
+          <span v-else>Жанр: {{ book.genre }}</span>
+        </p>
         <p class="book-availability">
           <input v-if="isEditing" type="number" v-model="book.availability" required/>
-          <span v-else>{{ book.availability }}</span>
+          <span v-else>на складе: {{ book.availability }}</span>
         </p>
 
         <div class="book-description">
@@ -52,11 +59,10 @@
     <!-- Buttons positioned at bottom-right -->
     <div v-if="!isEditing && authority === 'ADMIN'" class="edit-delete-buttons">
       <button @click="isEditing = true" class="edit-button">Изменить</button>
-      <button v-if="book.image" @click="removeImage" class="remove-image">Удалить книгу</button>
+      <button v-if="book.image" @click="removeBook" class="remove-image">Изменить статус</button>
     </div>
   </div>
 </template>
-
 
 
 <script>
@@ -67,7 +73,6 @@ export default {
   data() {
     return {
       book: {
-
         image: '',
         title: '',
         author: '',
@@ -75,8 +80,9 @@ export default {
         description: '',
         bookCode: '',
         price: '',
-        genre:'',
-        pages:''
+        genre: '',
+        pages: '',
+        status: ''
       },
       isEditing: false,
       authority: '',
@@ -102,6 +108,7 @@ export default {
         }
 
         const response = await axios.get("http://localhost:8080/api/v1/bookstore/getByBookCode/" + bookCode);
+        console.log(response)
         if (response.data && response.data.responseEntity) {
           this.book = {
             title: response.data.responseEntity.bookName,
@@ -112,7 +119,8 @@ export default {
             bookCode: response.data.responseEntity.bookCode,
             price: response.data.responseEntity.bookPrice,
             genre: response.data.responseEntity.genre,
-            pages:response.data.responseEntity.bookPages,
+            pages: response.data.responseEntity.bookPages,
+            status: response.data.responseEntity.bookStatusEnum
           };
         } else {
           this.errorMessage = "Книга не найдена!";
@@ -152,15 +160,6 @@ export default {
         this.errorMessage = "Произошла ошибка при загрузке данных.";
       }
     },
-    base64ToByteArray(base64String) {
-      // Remove the data URI scheme part (if it exists) to just get the base64 string
-      const base64Data = base64String.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
-
-      // Decode the base64 string to binary data
-      const byteArray = Uint8Array.from(atob(base64Data), char => char.charCodeAt(0));
-
-      return byteArray;
-    },
     async updateBook() {
       try {
         const token = localStorage.getItem('jwt')
@@ -173,8 +172,8 @@ export default {
           bookPublisher: this.book.author,
           bookPrice: this.book.price,
           bookDescription: this.book.description,
-          bookQuantity: this.book.availability
-        },{
+          bookQuantity: this.book.availability,
+        }, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -210,7 +209,30 @@ export default {
         reader.readAsDataURL(file);
       }
     },
-
+    async removeBook() {
+      try {
+        console.log(this.book.status)
+        let newStatus = this.book.status === 0 ? 2 : 0
+        console.log(newStatus)
+        const token = localStorage.getItem('jwt');
+        const response = await axios.post("http://localhost:8080/api/v1/bookstore/admin/changeBookStatus", {
+          bookCode: this.book.bookCode,
+          bookStatusId: newStatus
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(response)
+        if (response.data) {
+          this.book.status = newStatus;
+          alert(`Статус книги изменён на ${newStatus === 0 ? 'активен' : 'закрыт'}`);
+        }
+      } catch (error) {
+        console.error("Ошибка при удалении книги:", error.message);
+        alert("Произошла ошибка при удалении книги.");
+      }
+    }
 
   }
 };
@@ -282,7 +304,7 @@ export default {
   font-weight: bold;
 }
 
-.book-author {
+.book-author .book-pages {
   font-size: 0.9em;
   color: #bbb;
   margin-bottom: 20px;

@@ -1,6 +1,8 @@
 <template>
-  <div class="page-container-home">
+  <div>
+
     <section class="book-list" id="books">
+      <h2 class="page-title">Заблокированные книги</h2>
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       <div class="book-grid" v-else>
         <div v-for="book in books" :key="book.id" class="book" @click="onBookSelect(book)">
@@ -9,7 +11,7 @@
           </div>
           <h3>{{ book.title }}</h3>
           <p>{{ book.price }} $</p>
-          <button class="add-to-cart" @click="addToCart(book)">Add to Cart</button>
+          <button class="add-to-cart" @click="addToCart(book)" disabled>Add to Cart</button>
         </div>
       </div>
     </section>
@@ -29,6 +31,9 @@ export default {
     };
   },
   mounted() {
+    if (localStorage.getItem('jwt') == null || localStorage.getItem('authority') !== 'ADMIN') {
+      this.$router.push(`/api/v1/bookstore`);
+    }
     this.getAllBooks();
   },
   methods: {
@@ -41,7 +46,13 @@ export default {
     },
     async getAllBooks() {
       try {
-        const response = await axios.get("http://localhost:8080/api/v1/bookstore/home");
+        const token = localStorage.getItem('jwt')
+        const response = await axios.get("http://localhost:8080/api/v1/userManagement/getAllBlockedBooks", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(response)
         if (response.data && response.data.responseEntity) {
           console.log(response)
           this.books = response.data.responseEntity.listBookDto.map(bookDto => ({
@@ -109,12 +120,24 @@ export default {
 
 <style scoped>
 .book-list {
-  padding: 2em;
+  display: flex;
+  padding: 10em;
   text-align: center;
+  flex-direction: column;
   background-color: #1c1c1c;
   color: #fff;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
 }
-
+.page-title {
+  text-align: center;
+  font-size: 2em;
+  color: #fff;
+  padding-bottom:15px ;
+  position: relative;  /* Добавьте это, чтобы свойство top работало */
+  top: -40px;  /* Поднимет элемент на 15px выше */
+}
 .error-message {
   color: red;
   font-size: 1.2em;
@@ -125,9 +148,12 @@ export default {
   display: grid;
   grid-template-columns: repeat(3, minmax(200px, 1fr));
   gap: 1em;
+  align-items: center;
+  justify-content: center;
 }
 
 .book {
+
   display: flex;
   flex-direction: column;
   align-items: center; /* Центрируем элементы по горизонтали */
@@ -147,6 +173,7 @@ export default {
 }
 
 .book-image img {
+
   width: 100%; /* Картинки будут одинакового размера */
   height: 250px; /* Фиксированная высота */
   object-fit: cover; /* Изображение будет обрезаться, чтобы соответствовать размерам */

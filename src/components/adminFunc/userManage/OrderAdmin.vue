@@ -1,17 +1,16 @@
 <template>
   <div class="order-list">
-    <h1>Ваши заказы</h1>
+    <h1>Заказы</h1>
 
-    <!-- Сообщение об ошибке -->
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
-    <!-- Список заказов -->
     <div v-if="orders.length > 0" class="order-grid">
       <div v-for="order in orders" :key="order.orderCode" class="order-card">
         <div class="order-details">
           <h3>Заказ №{{ order.orderCode }}</h3>
+          <p><strong>Пользователь:</strong> {{ order.userName }}</p>
           <p><strong>Адрес:</strong> {{ order.address }}</p>
-          <p><strong>Дата:</strong> {{ order.orderDate}}</p>
+          <p><strong>Дата:</strong> {{ formatDate(order.orderDate) }}</p>
           <p><strong>Цена:</strong> {{ order.orderPrice }}$</p>
           <p><strong>Статус:</strong>
             <span :class="getStatusClass(order.status)">{{ getStatusText(order.status) }}</span>
@@ -37,7 +36,7 @@ export default {
   },
   mounted() {
     this.getOrders();
-    if (localStorage.getItem('jwt') == null) {
+    if (localStorage.getItem('jwt') == null || localStorage.getItem('authority') !== 'ADMIN') {
       this.$router.push(`/api/v1/bookstore`);
     }
   },
@@ -59,7 +58,7 @@ export default {
     async getOrders() {
       try {
         const token = localStorage.getItem("jwt");
-        const response = await axios.get("http://localhost:8080/api/v1/order/getOrderList", {
+        const response = await axios.get("http://localhost:8080/api/v1/userManagement/getAllOrders", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -68,14 +67,13 @@ export default {
 
         if (response.data && response.data.responseEntity) {
           this.orders = response.data.responseEntity.listOrderDto.map(orderDto => ({
-                address: orderDto.address,
-                orderPrice: orderDto.orderPrice,
-                orderDate: this.formatDate(orderDto.orderDate),
-                orderCode: orderDto.orderCode,
-                status: orderDto.orderStatus,
-              }
-          ));
-          console.log(this.orders[0].orderDate)
+            userName: orderDto.userName,
+            address: orderDto.address,
+            orderPrice: orderDto.orderPrice,
+            orderDate: orderDto.orderDate,
+            orderCode: orderDto.orderCode,
+            status: orderDto.orderStatus,
+          }));
         } else {
           this.errorMessage = "Заказы не найдены!";
         }
@@ -88,11 +86,13 @@ export default {
         }
       }
     },
+    // Преобразование статуса в текст
     getStatusText(status) {
       if (status === 6 || status === 'ORDER_ACTUAL') return "Открыт";
       if (status === 7 || status === 'ORDER_CLOSED') return "Закрыт";
       return "Неизвестный статус";
     },
+    // Класс для статуса
     getStatusClass(status) {
       if (status === 6 || status === 'ORDER_ACTUAL') return "status-open";
       if (status === 7 || status === 'ORDER_CLOSED') return "status-closed";

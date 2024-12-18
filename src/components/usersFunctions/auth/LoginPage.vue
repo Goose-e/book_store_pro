@@ -49,20 +49,23 @@ export default {
             login: this.username,
             password: this.password
           });
-          const jwt = response.data.accessToken;
-          localStorage.setItem("jwt", jwt);
-          localStorage.setItem('authority', response.data.authorities[0].authority);
-          this.$router.push('/api/v1/bookstore');
+            const jwt = response.data.accessToken;
+            localStorage.setItem("jwt", jwt);
+            localStorage.setItem('authority', response.data.authorities[0].authority);
+            this.$router.push('/api/v1/bookstore');
         } catch (error) {
-          if (error.response && error.response.status === 400 || error.response.status === 403) {
-            this.errorMessage = "Invalid username or password.";
+          if(error.response.status ===  403){
+            this.errorMessage = "Вы были заблокированы администрацией"
+          }
+          if (error.response && error.response.status === 400 ) {
+            this.errorMessage = "Неверный логин или пароль.";
           } else {
 
             console.error("An error occurred during login:", error.message);
           }
         }
       } else {
-        this.errorMessage = "Invalid username or password.";
+        this.errorMessage = "Неверный логин или пароль.";
       }
     },
     goToSignUp() {

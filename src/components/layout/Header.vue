@@ -21,13 +21,25 @@
 
         </div>
       </form>
-      <nav>
+      <nav v-if="authority !== 'ADMIN' ">
         <ul>
           <li><a href="http://localhost:5173/api/v1/bookstore">Главная</a></li>
           <li><a href="http://localhost:5173/api/v1/bookstore/about">О нас</a></li>
           <li><a href="http://localhost:5173/api/v1/bookstore/contact">Контакты</a></li>
-          <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/cart">Корзина</a></li>
-          <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/orderList">Заказы</a></li>
+          <li><a v-if="jwt != null"
+                 href="http://localhost:5173/api/v1/bookstore/cart">Корзина</a></li>
+          <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/orderList">Заказы</a>
+          </li>
+        </ul>
+      </nav>
+      <nav v-if="authority === 'ADMIN'">
+        <ul>
+          <li><a href="http://localhost:5173/api/v1/bookstore/admin/orders">Все заказы</a>
+          </li>
+          <li><a href="http://localhost:5173/api/v1/bookstore/admin/books">Заблокированные
+            книги</a></li>
+          <li><a href="http://localhost:5173/api/v1/bookstore/admin/users">Управление пользователями</a></li>
+          <li><a href="http://localhost:5173/api/v1/bookstore/admin/createBook">Создать книгу</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -46,6 +58,7 @@ export default {
   data() {
     return {
       jwt: localStorage.getItem('jwt'),
+      authority: localStorage.getItem('authority'),
       bookName: '',
       searchBookList: [],
       bookCode: '',
