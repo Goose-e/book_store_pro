@@ -5,9 +5,8 @@
     <!-- Сообщение об ошибке -->
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
-    <!-- Список заказов -->
     <div v-if="orders.length > 0" class="order-grid">
-      <div v-for="order in orders" :key="order.orderCode" class="order-card">
+      <div v-for="order in orders" :key="order.orderCode" class="order-card" @click="onOrderSelect(order.orderCode)">
         <div class="order-details">
           <h3>Заказ №{{ order.orderCode }}</h3>
           <p><strong>Адрес:</strong> {{ order.address }}</p>
@@ -55,11 +54,19 @@ export default {
       };
       return new Date(dateString[0], dateString[1], dateString[2], dateString[3], dateString[4], dateString[5], dateString[6]).toLocaleDateString("ru-RU", options);
     },
+    async onOrderSelect(order){
+      try {
+        console.log(order)
 
+        this.$router.push(`/api/v1/bookstore/orderDetails/${order}`);
+      } catch (error) {
+        console.error('Ошибка при выборе заказа:', error.message);
+      }
+    },
     async getOrders() {
       try {
         const token = localStorage.getItem("jwt");
-        const response = await axios.get("http://localhost:8080/api/v1/order/getOrderList", {
+        const response = await axios.get(`http://${this.$ComputerIP}/api/v1/order/getOrderList`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -132,7 +139,7 @@ export default {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s;
   height: 100%;
-  cursor: default;
+  cursor: pointer;
 }
 
 .order-card:hover {

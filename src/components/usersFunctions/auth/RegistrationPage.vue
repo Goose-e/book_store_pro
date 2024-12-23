@@ -2,23 +2,23 @@
   <div class="login-page">
     <div class="background">
       <div class="welcome-text">
-        <h1>Welcome to the Bookstore</h1>
-        <p>Create your account</p>
+        <h1>Добро пожаловать в магазин книг!</h1>
+        <p>Создайте свой аккаунт</p>
       </div>
     </div>
     <div class="login-container">
-      <h2>User Registration</h2>
+      <h2>Регистрация</h2>
       <form @submit.prevent="handleRegistration">
         <div class="input-group">
           <label for="username">
             <i class="icon user-icon"></i>
-            <input type="text" id="username" v-model="username" placeholder="Create username" required/>
+            <input type="text" id="username" maxlength="16" v-model="username" placeholder="Придумайте логин" required />
           </label>
         </div>
         <div class="input-group">
           <label for="password">
             <i class="icon lock-icon"></i>
-            <input type="password" id="password" v-model="password" placeholder="Create password" required/>
+            <input type="password" id="password" maxlength="16" v-model="password" placeholder="Придумайте пароль" required/>
           </label>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
@@ -44,11 +44,12 @@ export default {
     async handleRegistration() {
       console.log(this.username + this.password);
       try {
-        const response = await axios.post('http://localhost:8080/api/v1/auth/signup', {
+        const response = await axios.post(`http://${this.$ComputerIP}/api/v1/auth/signup`, {
           login: this.username,
           userAge: 18,
           password: this.password
         });
+        console.log(response)
         if (response.data["responseCode"] === "OC_BUGS" && response.data["message"] === "User already exist") {
           this.errorMessage = "User already exist.";
         }

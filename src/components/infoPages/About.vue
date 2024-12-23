@@ -49,9 +49,10 @@ export default {
 
 .about-us {
   max-width: 1200px;
-  margin: 30px auto;
   padding: 3em 1em;
-
+  padding-top: 100px;
+  align-content: center;
+  background-color: #393939;;
 }
 
 .about-content {
@@ -60,20 +61,20 @@ export default {
 
 .about-content h1 {
   font-size: 2.5em;
-  color: #333;
+  color: #fff8f8;
   margin-bottom: 0.5em;
 }
 
 .about-content h2 {
   font-size: 1.8em;
-  color: #555;
+  color: #fff9f9;
   margin-top: 1.5em;
 }
 
 .about-content p {
   font-size: 1.2em;
   line-height: 1.6;
-  color: #666;
+  color: #fff8f8;
   margin-bottom: 1em;
 }
 
@@ -85,7 +86,7 @@ export default {
 
 .about-content ul li {
   font-size: 1.1em;
-  color: #555;
+  color: #fff8f8;
 }
 html, body {
   height: 100%;

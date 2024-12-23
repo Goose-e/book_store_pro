@@ -10,10 +10,12 @@
 import BlockedBookList from '../components/adminFunc/booksManage/BlockedBookList.vue';
 import Header from "@/components/layout/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
-
+import logo from "@/assets/logo/logo.png";
 export default {
+
   mounted() {
-    document.title = "Главная";
+    document.title = "Заблокированные книги";
+    document.image ="../../assets/logo/logo.png"
   },
   components: {
     Header,

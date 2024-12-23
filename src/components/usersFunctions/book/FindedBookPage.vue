@@ -8,8 +8,8 @@
             <img :src="book.image" alt="Book Image"/>
           </div>
           <h3>{{ book.title }}</h3>
-          <p>{{ book.price }} $</p>
-          <button class="add-to-cart" @click="addToCart(book)">Add to Cart</button>
+          <p>Цена: {{ book.price }} $</p>
+          <button class="add-to-cart" @click="addToCart(book)">Добавить в корзину</button>
         </div>
       </div>
     </section>
@@ -25,11 +25,11 @@ export default {
     return {
       books: [],
       errorMessage: "",
-      bookName: "", // Мы будем использовать локальное состояние
+      bookName: "",
     };
   },
   mounted() {
-    // Если в localStorage есть bookName, загрузим книги
+
     const storedBookName = localStorage.getItem("bookName");
     if (storedBookName) {
       this.bookName = storedBookName;
@@ -58,7 +58,7 @@ export default {
       try {
         let bookName = this.$route.params.bookName;
         if (bookName) {
-          const response = await axios.get(`http://localhost:8080/api/v1/bookstore/getByBookName/${bookName}`);
+          const response = await axios.get(`http://${this.$ComputerIP}/api/v1/bookstore/getByBookName/${bookName}`);
           if (response.data && response.data.responseEntity) {
             this.books = response.data.responseEntity.listBookDto.map(bookDto => ({
               title: bookDto.bookName,
@@ -86,7 +86,7 @@ export default {
           const bookCode = book.code;
           const token = localStorage.getItem('jwt');
           if (token) {
-            await axios.post("http://localhost:8080/api/v1/cart/addToCart", { bookCode }, {
+            await axios.post(`http://${this.$ComputerIP}/api/v1/cart/addToCart`, { bookCode }, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

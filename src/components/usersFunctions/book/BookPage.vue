@@ -4,8 +4,9 @@
       <div class="book-image-container">
         <img :src="book.image" alt="Book Image" class="book-image" @click="editImage"/>
         <div class="book-price" style="margin-top: 30px">
+          <p>Цена:</p>
           <input v-if="isEditing" type="text" v-model="book.price" required/>
-          <span v-else> {{ book.price }}$</span>
+          <span v-else>{{ book.price }}$</span>
         </div>
         <button v-if="!isEditing" class="add-to-cart" @click="addToCart">Положить в корзину</button>
 
@@ -36,8 +37,13 @@
           <span v-else>страниц: {{ book.pages }}</span>
         </p>
         <p class="book-genre">
-          <input v-if="isEditing" type="text" v-model="book.genre" required/>
-          <span v-else>Жанр: {{ book.genre }}</span>
+          <label for="genreSelect">Жанр:</label>
+          <select v-if="isEditing" v-model="book.genre" id="genreSelect">
+            <option v-for="(label, key) in genreMapping" :key="key" :value="key">
+              {{ label }}
+            </option>
+          </select>
+          <span v-else>{{ getGenre(book.genre) }}</span>
         </p>
         <p class="book-availability">
           <input v-if="isEditing" type="number" v-model="book.availability" required/>
@@ -46,7 +52,10 @@
 
         <div class="book-description">
           <textarea v-if="isEditing" v-model="book.description" required></textarea>
-          <p v-else>{{ book.description }}</p>
+
+          <p v-else>
+            Описание:
+            {{ book.description }}</p>
         </div>
 
         <div v-if="isEditing">
@@ -86,6 +95,18 @@ export default {
       },
       isEditing: false,
       authority: '',
+      genreMapping: {
+        NO_GENRE: "Без жанра",
+        FANTASY: "Фантастика",
+        SCIENCE_FICTION: "Научная фантастика",
+        ROMANCE: "Романтика",
+        MYSTERY: "Детектив",
+        HORROR: "Ужасы",
+        THRILLER: "Триллер",
+        HISTORICAL: "Исторический",
+        CHILDREN: "Детская литература",
+        YOUNG_ADULT: "Молодежная литература"
+      }
     };
   },
 
@@ -98,6 +119,9 @@ export default {
     },
   },
   methods: {
+    getGenre(genre) {
+      return this.genreMapping[genre] || genre; // если жанр не найден в объекте, возвращаем сам жанр
+    },
     async getBook() {
       try {
         this.authority = localStorage.getItem('authority');
@@ -107,7 +131,7 @@ export default {
           return;
         }
 
-        const response = await axios.get("http://localhost:8080/api/v1/bookstore/getByBookCode/" + bookCode);
+        const response = await axios.get(`http://${this.$ComputerIP}/api/v1/bookstore/getByBookCode/` + bookCode);
         console.log(response)
         if (response.data && response.data.responseEntity) {
           this.book = {
@@ -143,7 +167,7 @@ export default {
         let bookCode = this.$route.params.bookCode;
         const token = localStorage.getItem('jwt');
         if (token != null) {
-          const response = await axios.post("http://localhost:8080/api/v1/cart/addToCart", {bookCode}, {
+          const response = await axios.post(`http://${this.$ComputerIP}/api/v1/cart/addToCart`, {bookCode}, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -161,9 +185,10 @@ export default {
       }
     },
     async updateBook() {
+
       try {
         const token = localStorage.getItem('jwt')
-        const response = await axios.post(`http://localhost:8080/api/v1/bookstore/admin/createOrUpdate`, {
+        const response = await axios.post(`http://${this.$ComputerIP}/api/v1/bookstore/admin/createOrUpdate`, {
           bookPages: this.book.pages,
           bookName: this.book.title,
           bookCode: this.book.bookCode,
@@ -215,7 +240,7 @@ export default {
         let newStatus = this.book.status === 0 ? 2 : 0
         console.log(newStatus)
         const token = localStorage.getItem('jwt');
-        const response = await axios.post("http://localhost:8080/api/v1/bookstore/admin/changeBookStatus", {
+        const response = await axios.post(`http://${this.$ComputerIP}/api/v1/bookstore/admin/changeBookStatus`, {
           bookCode: this.book.bookCode,
           bookStatusId: newStatus
         }, {
@@ -233,7 +258,6 @@ export default {
         alert("Произошла ошибка при удалении книги.");
       }
     }
-
   }
 };
 </script>

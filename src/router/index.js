@@ -7,35 +7,41 @@ import AboutView from "@/views/AboutView.vue";
 import ContactView from "@/views/ContactView.vue";
 import CartView from "@/views/CartView.vue";
 import OrderPageView from "@/views/OrderView.vue";
-import OrderListView from "@/views/orderListView.vue";
+import OrderListView from "@/views/OrderListView.vue";
 import FoundBooks from "@/views/FoundBooksView.vue";
 import OrderAdmin from "@/views/OrderAdminView.vue";
 import CreateBookView from "@/views/CreateBookView.vue";
 import AllBlockedBooksView from "@/views/AllBlockedBooksView.vue";
 import UserManagementView from "@/views/UserManagementView.vue";
+import OrderDetailsView from "@/views/OrderDetailsView.vue";
 const routes = [
     {
         path: '/',                // Корневой маршрут
         redirect: '/api/v1/bookstore',  // Перенаправление на страницу входа
     },
     {
-        path: '/api/v1/bookstore',  // Путь для главной страницы
-        name: 'home',  // Имя маршрута, без слэша в начале
+        path: '/api/v1/bookstore',
+        name: 'home',
         component: HomeView
     },
     {
-        path: '/api/v1/bookstore/admin/users',  // Путь для главной страницы
-        name: 'users',  // Имя маршрута, без слэша в начале
+        path: '/api/v1/bookstore/orderDetails/:orderCode',
+        name: 'orderDetails',
+        component: OrderDetailsView
+    },
+    {
+        path: '/api/v1/bookstore/admin/users',
+        name: 'users',
         component: UserManagementView
     },
     {
-        path: '/api/v1/bookstore/admin/createBook',  // Путь для главной страницы
-        name: 'createBook',  // Имя маршрута, без слэша в начале
+        path: '/api/v1/bookstore/admin/createBook',
+        name: 'createBook',
         component: CreateBookView
     },
     {
-        path: '/api/v1/bookstore/admin/orders',  // Путь для главной страницы
-        name: 'adminOrders',  // Имя маршрута, без слэша в начале
+        path: '/api/v1/bookstore/admin/orders',
+        name: 'adminOrders',
         component: OrderAdmin
     },
     {

@@ -27,7 +27,12 @@
           <input placeholder="Автор" type="text" v-model="author" required/>
         </p>
         <p class="book-genre">
-          <input placeholder="Жанр(пока не трогать)" type="text" v-model="genre" required/>
+          <label for="genreSelect">Жанр:</label>
+          <select  v-model="genre" id="genreSelect">
+            <option v-for="(label, key) in genreMapping" :key="key" :value="key">
+              {{ label }}
+            </option>
+          </select>
         </p>
         <p class="book-pages">
         <input placeholder="Количество страниц" type="number" v-model="pages" required/>
@@ -71,6 +76,18 @@ export default {
       ,
       isEditing: false,
       authority: '',
+      genreMapping: {
+        NO_GENRE: "Без жанра",
+        FANTASY: "Фантастика",
+        SCIENCE_FICTION: "Научная фантастика",
+        ROMANCE: "Романтика",
+        MYSTERY: "Детектив",
+        HORROR: "Ужасы",
+        THRILLER: "Триллер",
+        HISTORICAL: "Исторический",
+        CHILDREN: "Детская литература",
+        YOUNG_ADULT: "Молодежная литература"
+      }
     };
   },
   mounted() {
@@ -86,6 +103,9 @@ export default {
     },
   },
   methods: {
+    getGenre(genre) {
+      return this.genreMapping[genre] || genre; // если жанр не найден в объекте, возвращаем сам жанр
+    },
     byteArrayToBase64(base64String) {
       if (!base64String) {
         return logo;
@@ -95,14 +115,18 @@ export default {
 
 
     async updateBook() {
+      if (!this.title || !this.price || !this.genre || !this.pages || !this.availability) {
+        alert("Все поля обязательны для заполнения!");
+        return;
+      }
       try {
         const token = localStorage.getItem('jwt')
-        const response = await axios.post(`http://localhost:8080/api/v1/bookstore/admin/createOrUpdate`, {
+        const response = await axios.post(`http://${this.$ComputerIP}/api/v1/bookstore/admin/createOrUpdate`, {
           bookPages: this.pages,
           bookName: this.title,
           bookCode: this.bookCode,
           image: this.image,
-          genre: 'NO_GENRE',
+          genre: this.genre,
           bookPublisher: this.author,
           bookPrice: this.price,
           bookDescription: this.description,

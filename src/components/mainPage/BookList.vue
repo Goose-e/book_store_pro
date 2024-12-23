@@ -8,8 +8,8 @@
             <img :src="book.image" alt="Book Image"/>
           </div>
           <h3>{{ book.title }}</h3>
-          <p>{{ book.price }} $</p>
-          <button class="add-to-cart" @click="addToCart(book)">Add to Cart</button>
+          <p>Цена: {{ book.price }} $</p>
+          <button class="add-to-cart" @click="addToCart(book)">Добавить в корзину</button>
         </div>
       </div>
     </section>
@@ -41,7 +41,7 @@ export default {
     },
     async getAllBooks() {
       try {
-        const response = await axios.get("http://localhost:8080/api/v1/bookstore/home");
+        const response = await axios.get(`http://${this.$ComputerIP}/api/v1/bookstore/home`);
         if (response.data && response.data.responseEntity) {
           console.log(response)
           this.books = response.data.responseEntity.listBookDto.map(bookDto => ({
@@ -72,7 +72,7 @@ export default {
           console.log(bookCode)
           const token = localStorage.getItem('jwt')
           if (token != null) {
-            const response = (await axios.post("http://localhost:8080/api/v1/cart/addToCart",
+            const response = (await axios.post(`http://${this.$ComputerIP}/api/v1/cart/addToCart`,
                 {bookCode}, {
                   headers: {
                     'Authorization': `Bearer ${token}`

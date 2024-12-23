@@ -5,7 +5,7 @@
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
     <div v-if="orders.length > 0" class="order-grid">
-      <div v-for="order in orders" :key="order.orderCode" class="order-card">
+      <div v-for="order in orders" :key="order.orderCode" class="order-card" @click ="onOrderSelect(order.orderCode)">
         <div class="order-details">
           <h3>Заказ №{{ order.orderCode }}</h3>
           <p><strong>Пользователь:</strong> {{ order.userName }}</p>
@@ -41,7 +41,15 @@ export default {
     }
   },
   methods: {
+    async onOrderSelect(order){
+      try {
+        console.log(order)
 
+        this.$router.push(`/api/v1/bookstore/orderDetails/${order}`);
+      } catch (error) {
+        console.error('Ошибка при выборе заказа:', error.message);
+      }
+    },
     formatDate(dateString) {
 
       const options = {
@@ -58,7 +66,7 @@ export default {
     async getOrders() {
       try {
         const token = localStorage.getItem("jwt");
-        const response = await axios.get("http://localhost:8080/api/v1/userManagement/getAllOrders", {
+        const response = await axios.get(`http://${this.$ComputerIP}/api/v1/userManagement/getAllOrders`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -132,7 +140,7 @@ export default {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s;
   height: 100%;
-  cursor: default;
+  cursor: pointer;
 }
 
 .order-card:hover {

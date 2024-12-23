@@ -17,10 +17,10 @@
         <td>{{ index + 1 }}</td>
         <td>{{ user.login }}</td>
         <td>{{ user.userRole === 'USER' ? 'Пользователь' : 'Администратор' }}</td>
-        <td>{{ user.isBlocked === 'USER_CLOSED'? 'Заблокирован' : 'Активен' }}</td>
+        <td>{{ user.isBlocked === 'USER_CLOSED' ? 'Заблокирован' : 'Активен' }}</td>
         <td>
           <button @click="toggleBlockUser(user)">
-            {{ user.isBlocked  === 'USER_CLOSED' ? 'Разблокировать' : 'Заблокировать' }}
+            {{ user.isBlocked === 'USER_CLOSED' ? 'Разблокировать' : 'Заблокировать' }}
           </button>
         </td>
       </tr>
@@ -30,8 +30,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import {ref, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
 import axios from 'axios'
 
 const users = ref([])
@@ -54,6 +54,8 @@ const getAllUsers = async (token) => {
         Authorization: `Bearer ${token}`,
       },
     })
+
+
     if (response.data && response.data.responseEntity) {
       console.log(response)
       users.value = response.data.responseEntity.listUsersDto.map(userDto => ({
@@ -64,7 +66,8 @@ const getAllUsers = async (token) => {
     } else {
       console.error("Пользователи не найдены.")
     }
-  } catch (error) {
+  } catch
+      (error) {
     if (error.response && error.response.status === 400) {
       console.error("Ошибка на сервере.")
     } else {
@@ -77,7 +80,7 @@ const toggleBlockUser = async (user) => {
   const token = localStorage.getItem('jwt')
   try {
     const newStatus = user.isBlocked === 'USER_ACTUAL' ? 3 : 1
-    await axios.post(
+    const response = await axios.post(
         "http://localhost:8080/api/v1/userManagement/updateUserStatus",
         {
           login: user.login,
@@ -89,8 +92,14 @@ const toggleBlockUser = async (user) => {
           },
         }
     )
-    location.reload()
-    user.isBlocked = !user.isBlocked
+    if (response.data.message === "Self harassment") {
+      alert("Вы пытаетесь заблокировать себя!")
+    } else {
+      location.reload()
+      user.isBlocked = !user.isBlocked
+    }
+
+
   } catch (error) {
     console.error("Ошибка изменения статуса пользователя:", error.message)
   }
@@ -101,7 +110,8 @@ const toggleBlockUser = async (user) => {
 .users-page {
   font-family: Arial, sans-serif;
   padding: 20px;
-  padding-top: 90px;
+  padding-top: 95px;
+  color: #ffffff;
 }
 
 h1 {
@@ -119,13 +129,13 @@ table {
 
 table th,
 table td {
-  border: 1px solid #ddd;
+  border: 1px solid #4c4848;
   padding: 10px;
   text-align: left;
 }
 
 table th {
-  background-color: #f4f4f4;
+  background-color: #88620f;
 }
 
 button {

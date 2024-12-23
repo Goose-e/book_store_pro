@@ -32,15 +32,13 @@ export default {
   },
   methods: {
     handleSubmit() {
-      // Логика отправки
+
       console.log("Форма отправлена:", this.form);
 
-      // Очистка полей формы
       this.form.name = '';
       this.form.email = '';
       this.form.message = '';
 
-      // Сообщение об успешной отправке
       alert('Ваше сообщение отправлено!');
     }
   }
@@ -58,16 +56,21 @@ export default {
 .contact-header {
   font-size: 2em;
   margin-bottom: 20px;
+  color: #ffffff;
 }
 
 .contact-details {
   margin-bottom: 30px;
+  color: #ffffff;
+
 }
 
 .contact-details p {
   margin: 5px 0;
 }
-
+.contact-form{
+  color: #ffffff;
+}
 .contact-form input,
 .contact-form textarea {
   width: 100%;
@@ -75,6 +78,7 @@ export default {
   margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
+
 }
 
 .contact-form button {

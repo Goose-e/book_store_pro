@@ -2,23 +2,23 @@
   <div class="login-page">
     <div class="background">
       <div class="welcome-text">
-        <h1>Welcome to the Bookstore</h1>
-        <p>Welcome text</p>
+        <h1>Добро пожаловать в магазин книг!</h1>
+        <p>☻Удачи выжить☻</p>
       </div>
     </div>
     <div class="login-container">
-      <h2>User Login</h2>
+      <h2>Авторизация</h2>
       <form @submit.prevent="handleLogin">
         <div class="input-group">
           <label for="username">
             <i class="icon user-icon"></i>
-            <input type="text" id="username" v-model="username" placeholder="Login" required/>
+            <input type="text" id="username" maxlength="16" v-model="username" placeholder="Логин" required/>
           </label>
         </div>
         <div class="input-group">
           <label for="password">
             <i class="icon lock-icon"></i>
-            <input type="password" id="password" v-model="password" placeholder="Password" required/>
+            <input type="password" id="password" maxlength="16" v-model="password" placeholder="Пароль" required/>
           </label>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
@@ -45,19 +45,19 @@ export default {
     async handleLogin() {
       if (this.username && this.password) {
         try {
-          const response = await axios.post('http://localhost:8080/api/v1/auth/signin', {
+          const response = await axios.post(`http://${this.$ComputerIP}/api/v1/auth/signin`, {
             login: this.username,
             password: this.password
           });
-            const jwt = response.data.accessToken;
-            localStorage.setItem("jwt", jwt);
-            localStorage.setItem('authority', response.data.authorities[0].authority);
-            this.$router.push('/api/v1/bookstore');
+          const jwt = response.data.accessToken;
+          localStorage.setItem("jwt", jwt);
+          localStorage.setItem('authority', response.data.authorities[0].authority);
+          this.$router.push('/api/v1/bookstore');
         } catch (error) {
-          if(error.response.status ===  403){
+          if (error.response.status === 403) {
             this.errorMessage = "Вы были заблокированы администрацией"
           }
-          if (error.response && error.response.status === 400 ) {
+          if (error.response && error.response.status === 400) {
             this.errorMessage = "Неверный логин или пароль.";
           } else {
 

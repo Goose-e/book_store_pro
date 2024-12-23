@@ -28,6 +28,7 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #1c1c1c;
 }
 
 footer {

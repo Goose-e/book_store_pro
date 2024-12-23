@@ -33,6 +33,7 @@ body, html {
   display: flex;
   flex-direction: column; /* Располагаем элементы вертикально */
   min-height: 100vh; /* Заставляем контейнер занимать всю высоту окна */
+  background-color: #1c1c1c;
 }
 
 main {

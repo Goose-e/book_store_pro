@@ -1,21 +1,21 @@
 <template>
   <div class="page-container">
     <Header/>
-    <Cart/>
+    <Order/>
     <Footer/>
   </div>
 </template>
 <script>
-import Cart from '@/components/usersFunctions/shopping/cart/Cart.vue';
+import Order from '@/components/usersFunctions/shopping/order/OrderPage.vue';
 import Header from "@/components/layout/Header.vue";
 import Footer from "@/components/layout/Footer.vue";
 export default {
   mounted() {
-    document.title = "Корзина";
+    document.title = "Детали заказа ";
   },
   components: {
     Header,
-    Cart,
+    Order,
     Footer,
   }
 };
@@ -24,7 +24,7 @@ export default {
 body, html {
   margin: 0;
   padding: 0;
-  height: 100%; /* Важно: чтобы Flexbox работал корректно */
+  height: 100%;
 }
 
 .page-container {
@@ -35,8 +35,8 @@ body, html {
   min-height: 100vh;
 }
 main {
-  flex: 1; /* Заставляем основной контент занимать всё доступное пространство */
-  padding-top: 80px; /* Отступ сверху для основного контента */
+  flex: 1;
+  padding-top: 80px;
 }
 
 footer {

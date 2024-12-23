@@ -14,7 +14,7 @@
       </div>
       <div class="order-summary">
         <h2>Итог заказа</h2>
-        <p>Общая сумма: <strong>{{ this.orderPrice }} ₽</strong></p>
+        <p>Общая сумма: <strong>{{ this.orderPrice }} $</strong></p>
       </div>
       <button type="submit" class="submit-button">Подтвердить заказ</button>
     </form>
@@ -57,7 +57,7 @@ export default {
       try {
         const token = localStorage.getItem('jwt');
         const response = await axios.post(
-            "http://localhost:8080/api/v1/order/addOrder",
+            `http://${this.$ComputerIP}/api/v1/order/addOrder`,
             { address: this.order.address },
             {
               headers: {

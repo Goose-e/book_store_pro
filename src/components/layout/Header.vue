@@ -1,5 +1,5 @@
 <template>
-  <header :class="{ 'hidden': isHeaderHidden }">
+  <header ref="header" :class="{ 'hidden': isHeaderHidden }">
     <div class="header-container">
       <img src="../../assets/logo/logo.png" alt="Bookstore Logo" @click="goToHome()" class="logo">
       <form @submit.prevent class="header-search-bar">
@@ -18,30 +18,35 @@
             </li>
             <li v-if="filteredBooks.length > 15">...</li>
           </ul>
-
         </div>
       </form>
-      <nav v-if="authority !== 'ADMIN' ">
+
+
+      <div class="burger-menu" @click="toggleMenu">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+
+      <nav v-if="authority !== 'ADMIN'" :class="{ 'show': isMenuVisible }">
         <ul>
-          <li><a href="http://localhost:5173/api/v1/bookstore">Главная</a></li>
-          <li><a href="http://localhost:5173/api/v1/bookstore/about">О нас</a></li>
-          <li><a href="http://localhost:5173/api/v1/bookstore/contact">Контакты</a></li>
-          <li><a v-if="jwt != null"
-                 href="http://localhost:5173/api/v1/bookstore/cart">Корзина</a></li>
-          <li><a v-if="jwt != null" href="http://localhost:5173/api/v1/bookstore/orderList">Заказы</a>
-          </li>
+          <li><a :href="getLink('/api/v1/bookstore')">Главная</a></li>
+          <li><a :href="getLink('/api/v1/bookstore/about')">О нас</a></li>
+          <li><a :href="getLink('/api/v1/bookstore/contact')">Контакты</a></li>
+          <li><a v-if="jwt != null" :href="getLink('/api/v1/bookstore/cart')">Корзина</a></li>
+          <li><a v-if="jwt != null" :href="getLink('/api/v1/bookstore/orderList')">Заказы</a></li>
         </ul>
       </nav>
-      <nav v-if="authority === 'ADMIN'">
+
+      <nav v-if="authority === 'ADMIN'" :class="{ 'show': isMenuVisible }">
         <ul>
-          <li><a href="http://localhost:5173/api/v1/bookstore/admin/orders">Все заказы</a>
-          </li>
-          <li><a href="http://localhost:5173/api/v1/bookstore/admin/books">Заблокированные
-            книги</a></li>
-          <li><a href="http://localhost:5173/api/v1/bookstore/admin/users">Управление пользователями</a></li>
-          <li><a href="http://localhost:5173/api/v1/bookstore/admin/createBook">Создать книгу</a></li>
+          <li><a :href="getLink('/api/v1/bookstore/admin/orders')">Все заказы</a></li>
+          <li><a :href="getLink('/api/v1/bookstore/admin/createBook')">Создать книгу</a></li>
+          <li><a :href="getLink('/api/v1/bookstore/admin/users')">Управление пользователями</a></li>
+          <li><a :href="getLink('/api/v1/bookstore/admin/books')">Заблокированные книги</a></li>
         </ul>
       </nav>
+
       <div class="header-actions">
         <button v-if="jwt != null" class="logout-button" @click="logout()">Выйти</button>
         <button v-if="jwt == null" class="login-button" @click="login()">Войти в аккаунт</button>
@@ -49,6 +54,7 @@
     </div>
   </header>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -65,14 +71,21 @@ export default {
       lastScrollPosition: 0,
       isHeaderHidden: false,
       isSearchResultsVisible: true,
+      isMenuVisible: false,
+      lastTouchY: 0,
+      isMobile: false,
     };
   },
   mounted() {
+    this.checkIfMobile(); // Проверяем, мобильное ли устройство
+    this.addSwipeEventListeners();
     this.getBooks();
     window.addEventListener('scroll', this.handleScroll);
+    this.addSwipeEventListeners();
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
+    this.removeSwipeEventListeners();
   },
   computed: {
     filteredBooks() {
@@ -86,6 +99,17 @@ export default {
     },
   },
   methods: {
+    checkIfMobile() {
+      this.isMobile = window.innerWidth <= 768; // Проверка мобильного устройства
+      if (this.isMobile) {
+        this.addSwipeEventListeners();
+      } else {
+        this.removeSwipeEventListeners();
+      }
+    },
+    toggleMenu() {
+      this.isMenuVisible = !this.isMenuVisible;
+    },
     goToHome() {
       this.$router.push('/api/v1/bookstore');
     },
@@ -93,9 +117,34 @@ export default {
       const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
       this.isHeaderHidden = currentScrollPosition > this.lastScrollPosition;
-      this.isSearchResultsVisible = currentScrollPosition < this.lastScrollPosition
+      this.isSearchResultsVisible = currentScrollPosition < this.lastScrollPosition;
 
       this.lastScrollPosition = currentScrollPosition <= 0 ? 0 : currentScrollPosition;
+    },
+    addSwipeEventListeners() {
+      const header = this.$refs.header;
+      header.addEventListener('touchstart', this.handleTouchStart);
+      header.addEventListener('touchend', this.handleTouchEnd);
+    },
+    removeSwipeEventListeners() {
+      const header = this.$refs.header;
+      header.removeEventListener('touchstart', this.handleTouchStart);
+      header.removeEventListener('touchend', this.handleTouchEnd);
+    },
+    handleTouchStart(event) {
+      if (Math.abs(event.touches[0].clientY - this.lastTouchY) > 10) {
+        event.preventDefault();
+      }
+      this.lastTouchY = event.touches[0].clientY;
+    },
+    handleTouchEnd(event) {
+      const currentTouchY = event.changedTouches[0].clientY;
+
+      if (this.lastTouchY - currentTouchY > 50) {
+        this.isHeaderHidden = true;
+      } else if (currentTouchY - this.lastTouchY > 50) {
+        this.isHeaderHidden = false;
+      }
     },
     async onBookSelect(book) {
       try {
@@ -109,7 +158,7 @@ export default {
     },
     async getBooks() {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/bookstore/home');
+        const response = await axios.get(`http://${this.$ComputerIP}/api/v1/bookstore/home`);
         if (response.data && response.data.responseEntity) {
           this.searchBookList = response.data.responseEntity.listBookDto.map(bookDto => ({
             title: bookDto.bookName,
@@ -142,16 +191,18 @@ export default {
     onSearchEnter() {
       if (this.bookName.trim() !== '') {
         this.$router.push(`/api/v1/bookstore/searchBooks/${this.bookName}`);
-
       }
-    }
+    },
 
+    getLink(path) {
+      return `${window.location.origin}${path}`;
+    }
   }
 };
 </script>
 
 <style scoped>
-/* Основной стиль для header */
+
 header {
   background-color: #333;
   color: #fff;
@@ -161,6 +212,7 @@ header {
   width: 100%;
   z-index: 1000;
   transition: transform 0.3s ease-in-out;
+  overflow: visible;
 }
 
 header.hidden {
@@ -183,6 +235,25 @@ header.hidden {
   cursor: pointer;
 }
 
+.burger-menu {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  border: none;
+}
+
+.burger-menu div {
+  width: 30px;
+  height: 4px;
+  background-color: #fff;
+  border-radius: 2px;
+}
+
 .header-search-bar {
   flex-grow: 1;
   margin: 0 1em;
@@ -200,7 +271,7 @@ header.hidden {
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: #fff;
+  background-color: #393939;
   border: 1px solid #ccc;
   padding: 0.5em;
   width: 100%;
@@ -214,7 +285,7 @@ header.hidden {
   align-items: center;
   padding: 0.5em;
   border-bottom: 1px solid #ccc;
-  cursor: pointer; /* Добавляем стиль для изменения курсора */
+  cursor: pointer;
 }
 
 .search-results li:last-child {
@@ -260,11 +331,29 @@ header.hidden {
   border-radius: 4px;
 }
 
-/* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
   .header-container {
     flex-direction: column;
-    align-items: flex-start;
+    align-content: center;
+  }
+
+  .burger-menu {
+    display: flex;
+    padding-bottom: 5px;
+  }
+
+  .header-container nav {
+    display: none;
+  }
+
+  .header-container nav.show {
+    display: block;
+  }
+
+  .header-container nav ul li {
+    margin: 0 2em;
+    padding-left: 0; /* Уберите или уменьшите отступ внутри элементов */
+    text-align: left; /* Убедитесь, что текст выравнен по левому краю */
   }
 
   .header-search-bar {
@@ -272,32 +361,43 @@ header.hidden {
     margin: 0.5em 0;
   }
 
+  .header-container nav ul li a {
+    font-size: 1.1em;
+    padding: 1em 1.1em;
+  }
+
   .search-bar {
     width: 100%;
   }
 
+  .header-container nav ul li a:hover {
+    background-color: #0f2c47;
+  }
+
   nav ul {
-    flex-direction: column;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
     width: 100%;
-    align-items: flex-start;
     padding: 0;
   }
 
   nav ul li {
-    margin: 0.5em 0;
+    width: 33.33%;
+    text-align: center;
+  }
+
+  nav ul li a {
+    display: block;
+    padding: 1em;
+    text-decoration: none;
+    color: white;
+    align-content: center;
   }
 
   .header-actions {
-    width: 100%;
     display: flex;
-    justify-content: flex-start;
-    margin-top: 0.5em;
-  }
-
-  .login-button,
-  .logout-button {
-    width: 100%;
-    margin: 0.2em 0;
+    flex-direction: column;
   }
 }
 </style>
